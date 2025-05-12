@@ -41,13 +41,29 @@ resource "aws_instance" "web_server" {
   vpc_security_group_ids = [aws_security_group.allow_ssh.id]
   key_name               = var.key_name
 
-  user_data = <<-EOF
-              #!/bin/bash
-              apt-get update -y
-              apt-get install nginx -y
-              systemctl enable nginx
-              systemctl start nginx
-              EOF
+user_data = <<-EOF
+  #!/bin/bash
+  apt-get update -y
+  apt-get install nginx -y
+  cat <<EOM > /var/www/html/index.html
+  <!DOCTYPE html>
+  <html>
+  <head>
+      <title>My Terraform EC2</title>
+      <style>
+          body { background-color: #222; color: #eee; font-family: sans-serif; text-align: center; padding-top: 50px; }
+          h1 { color: #00ff99; }
+      </style>
+  </head>
+  <body>
+      <h1>🚀 Terraform EC2 is Live!</h1>
+      <p>This page is served by Nginx on an EC2 instance provisioned with Terraform.</p>
+  </body>
+  </html>
+  EOM
+  systemctl restart nginx
+EOF
+
 
 
   tags = {
